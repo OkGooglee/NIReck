@@ -6,7 +6,6 @@
 <title>System Decoder</title>
 
 <style>
-
 *{
     margin:0;
     padding:0;
@@ -15,13 +14,12 @@
 
 body{
     font-family:'Courier New', monospace;
-    background:radial-gradient(circle at top,#0a0f1c,#000);
+    background: radial-gradient(circle at top, #0a0f1c, #000);
     color:#00f5ff;
     overflow:hidden;
 }
 
-/* MATRIX BACKGROUND */
-
+/* MATRIX */
 canvas{
     position:fixed;
     top:0;
@@ -29,20 +27,40 @@ canvas{
     width:100%;
     height:100%;
     z-index:0;
-    filter:blur(0.5px) brightness(1.2);
+    filter: blur(0.5px) brightness(1.2);
 }
 
-/* MAIN CONTAINER */
+/* SCANLINE */
+body::before{
+    content:"";
+    position:fixed;
+    width:100%;
+    height:100%;
+    top:0;
+    left:0;
+    background: repeating-linear-gradient(
+        to bottom,
+        rgba(255,255,255,0.02),
+        rgba(255,255,255,0.02) 1px,
+        transparent 2px,
+        transparent 4px
+    );
+    z-index:1;
+    pointer-events:none;
+    opacity:0.2;
+}
 
-.container{
-    position:relative;
-    z-index:2;
+/* LOGIN SCREEN */
+.loginBox{
+    position:absolute;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%);
+    z-index:5;
 
-    width:95%;
-    max-width:720px;
-
-    margin:40px auto;
-    padding:25px;
+    width:90%;
+    max-width:400px;
+    padding:30px;
 
     background:rgba(10,15,25,0.75);
     backdrop-filter:blur(12px);
@@ -53,6 +71,78 @@ canvas{
     box-shadow:
         0 0 25px rgba(0,245,255,0.2),
         inset 0 0 20px rgba(0,245,255,0.05);
+
+    text-align:center;
+}
+
+.loginBox h2{
+    margin-bottom:20px;
+    letter-spacing:2px;
+    text-shadow:0 0 10px #00f5ff;
+}
+
+.loginBox input{
+    width:100%;
+    padding:12px;
+    margin:10px 0;
+
+    border:none;
+    outline:none;
+
+    border-radius:10px;
+    background:rgba(0,0,0,0.6);
+
+    color:#00f5ff;
+    border:1px solid rgba(0,245,255,0.3);
+}
+
+.loginBox button{
+    width:100%;
+    padding:12px;
+    margin-top:15px;
+
+    border:none;
+    border-radius:10px;
+
+    background:#00f5ff;
+    color:#000;
+
+    font-weight:bold;
+    cursor:pointer;
+    transition:0.3s;
+}
+
+.loginBox button:hover{
+    transform:scale(1.03);
+    box-shadow:0 0 20px #00f5ff;
+}
+
+.error{
+    color:#ff4a4a;
+    margin-top:10px;
+    font-size:14px;
+}
+
+/* MAIN CONTAINER */
+.container{
+    position:relative;
+    z-index:2;
+    width:90%;
+    max-width:720px;
+    margin:60px auto;
+    padding:25px;
+
+    background: rgba(10, 15, 25, 0.75);
+    backdrop-filter: blur(12px);
+
+    border:1px solid rgba(0,245,255,0.3);
+    border-radius:18px;
+
+    box-shadow:
+        0 0 25px rgba(0,245,255,0.2),
+        inset 0 0 20px rgba(0,245,255,0.05);
+
+    display:none;
 }
 
 h1{
@@ -60,7 +150,6 @@ h1{
     margin-bottom:20px;
     font-size:24px;
     letter-spacing:3px;
-
     color:#00f5ff;
 
     text-shadow:
@@ -68,27 +157,24 @@ h1{
         0 0 20px #00f5ff55;
 }
 
-/* TEXT AREA */
-
 textarea{
     width:100%;
     min-height:130px;
 
-    background:rgba(0,0,0,0.6);
+    background: rgba(0,0,0,0.6);
 
     border:1px solid rgba(0,245,255,0.4);
     border-radius:10px;
 
     color:#7df9ff;
-
     padding:14px;
+
     font-size:14px;
 
     outline:none;
     resize:none;
 
-    box-shadow:inset 0 0 10px rgba(0,245,255,0.08);
-
+    box-shadow: inset 0 0 10px rgba(0,245,255,0.08);
     transition:0.3s;
 }
 
@@ -97,130 +183,53 @@ textarea:focus{
     box-shadow:0 0 15px #00f5ff55;
 }
 
-/* BUTTON GRID FIXED */
-
 .buttons{
     display:grid;
-
-    grid-template-columns:
-    repeat(auto-fit,minmax(120px,1fr));
-
+    grid-template-columns:repeat(4,1fr);
     gap:10px;
     margin-top:12px;
 }
 
-/* BUTTON STYLE */
-
-button{
-    width:100%;
-    min-width:0;
-
+button.action{
     padding:10px;
-
     border-radius:10px;
 
-    background:
-    linear-gradient(145deg,#05070a,#0b1220);
-
+    background: linear-gradient(145deg, #05070a, #0b1220);
     border:1px solid rgba(0,245,255,0.4);
 
     color:#00f5ff;
-
     cursor:pointer;
-
     transition:0.25s;
 
     font-weight:bold;
     letter-spacing:1px;
 
-    box-shadow:
-    0 0 10px rgba(0,245,255,0.1);
+    box-shadow:0 0 10px rgba(0,245,255,0.1);
 }
 
-button:hover{
+button.action:hover{
     background:#00f5ff;
     color:#000;
-
-    transform:
-    translateY(-2px) scale(1.03);
-
-    box-shadow:
-    0 0 20px #00f5ff88;
+    transform: translateY(-2px) scale(1.03);
+    box-shadow:0 0 20px #00f5ff88;
 }
-
-/* OUTPUT */
 
 .output{
     margin-top:18px;
-
     border-radius:12px;
 
     border:1px solid rgba(0,245,255,0.4);
-
     padding:14px;
-
     min-height:100px;
 
-    background:rgba(0,0,0,0.5);
+    background: rgba(0,0,0,0.5);
 
     white-space:pre-wrap;
 
     box-shadow:
-    inset 0 0 12px rgba(0,245,255,0.08),
-    0 0 15px rgba(0,245,255,0.15);
+        inset 0 0 12px rgba(0,245,255,0.08),
+        0 0 15px rgba(0,245,255,0.15);
 }
-
-.loading{
-    text-shadow:0 0 10px #00f5ff;
-}
-
-/* SCAN LINE */
-
-body::before{
-    content:"";
-
-    position:fixed;
-
-    top:0;
-    left:0;
-
-    width:100%;
-    height:100%;
-
-    background:
-    repeating-linear-gradient(
-        to bottom,
-        rgba(255,255,255,0.02),
-        rgba(255,255,255,0.02) 1px,
-        transparent 2px,
-        transparent 4px
-    );
-
-    pointer-events:none;
-
-    z-index:1;
-    opacity:0.2;
-}
-
-/* MOBILE FIX */
-
-@media(max-width:500px){
-
-    h1{
-        font-size:20px;
-    }
-
-    button{
-        font-size:13px;
-        padding:12px 6px;
-    }
-
-    textarea{
-        font-size:13px;
-    }
-
-}
-
 </style>
 </head>
 
@@ -228,109 +237,73 @@ body::before{
 
 <canvas id="bg"></canvas>
 
-<div class="container">
+<!-- LOGIN -->
+<div class="loginBox" id="loginBox">
+
+    <h2>ADMIN ACCESS</h2>
+
+    <input type="text" id="adminName" placeholder="Admin Name">
+
+    <input type="password" id="adminPass" placeholder="Password">
+
+    <button onclick="login()">LOGIN</button>
+
+    <div class="error" id="error"></div>
+
+</div>
+
+<!-- MAIN APP -->
+<div class="container" id="mainContainer">
 
 <h1>📖 NIRECK 📖</h1>
 
-<textarea id="input"
-placeholder=">_PROCESSING ...">
-</textarea>
+<textarea id="input" placeholder=">_PROCESSING"></textarea>
 
 <div class="buttons">
-
-<button onclick="encode()">3MCQ63</button>
-
-<button onclick="decode()">63CQ63</button>
-
-<button onclick="copyText()">CQ7U</button>
-
-<button onclick="resetAll()">J3$3+</button>
-
+    <button class="action" onclick="encode()">3MCQ63</button>
+    <button class="action" onclick="decode()">63CQ63</button>
+    <button class="action" onclick="copyText()">CQ7U</button>
+    <button class="action" onclick="resetAll()">J3$3+</button>
 </div>
 
-<div class="output loading"
-id="output">
-
-</div>
+<div class="output" id="output">Virus Downloading</div>
 
 </div>
 
 <script>
 
 /* MATRIX BACKGROUND */
+const canvas = document.getElementById("bg");
+const ctx = canvas.getContext("2d");
 
-const canvas =
-document.getElementById("bg");
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
 
-const ctx =
-canvas.getContext("2d");
-
-function resizeCanvas(){
-
-    canvas.width =
-    window.innerWidth;
-
-    canvas.height =
-    window.innerHeight;
-}
-
-resizeCanvas();
-
-window.addEventListener(
-"resize",
-resizeCanvas
-);
+window.addEventListener("resize", ()=>{
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+});
 
 const chars = "CHARLIE";
 const size = 18;
-
-let cols =
-Math.floor(canvas.width / size);
-
-let drops =
-Array(cols).fill(1);
+const cols = canvas.width / size;
+const drops = Array(Math.floor(cols)).fill(1);
 
 function draw(){
+    ctx.fillStyle = "rgba(0,0,0,0.08)";
+    ctx.fillRect(0,0,canvas.width,canvas.height);
 
-    ctx.fillStyle =
-    "rgba(0,0,0,0.08)";
-
-    ctx.fillRect(
-    0,
-    0,
-    canvas.width,
-    canvas.height
-    );
-
-    ctx.fillStyle =
-    "#00f5ff";
-
-    ctx.font =
-    size + "px monospace";
+    ctx.fillStyle = "#00f5ff";
+    ctx.font = size + "px monospace";
 
     for(let i=0;i<drops.length;i++){
 
-        let text =
-        chars[
-        Math.floor(
-        Math.random()
-        * chars.length
-        )
-        ];
+        let text = chars[Math.floor(Math.random()*chars.length)];
 
-        ctx.fillText(
-        text,
-        i*size,
-        drops[i]*size
-        );
+        ctx.fillText(text, i*size, drops[i]*size);
 
-        if(
-        drops[i]*size >
-        canvas.height
-        &&
-        Math.random() > 0.975
-        ){
-            drops[i]=0;
+        if(drops[i]*size > canvas.height && Math.random()>0.975){
+            drops[i] = 0;
         }
 
         drops[i]++;
@@ -339,150 +312,111 @@ function draw(){
 
 setInterval(draw,40);
 
-/* ENCODE MAP */
+/* LOGIN SYSTEM */
+function login(){
 
+    let name = document.getElementById("adminName").value;
+    let pass = document.getElementById("adminPass").value;
+
+    if(name === "Charlie" && pass === "Charlie"){
+
+        document.getElementById("loginBox").style.display = "none";
+
+        document.getElementById("mainContainer").style.display = "block";
+
+    }else{
+
+        document.getElementById("error").innerText =
+        "ACCESS DENIED";
+
+    }
+}
+
+/* ENCODE / DECODE */
 const encodeMap = {
-
-'A':'@',
-'B':'8',
-'C':'C',
-'D':'9',
-'E':'3',
-'F':'#',
-'G':'6',
-'H':'A',
-'I':'!',
-'J':'R',
-'K':'5',
-'L':'1',
-'M':'N',
-'N':'M',
-'O':'Q',
-'P':'7',
-'Q':'O',
-'R':'J',
-'S':'$',
-'T':'+',
-'U':'W',
-'V':'/',
-'W':'%',
-'X':'Y',
-'Y':'U',
-'Z':'2',
-'.':'E'
-
+'A':'@','B':'8','C':'C','D':'9','E':'3','F':'#','G':'6',
+'H':'A','I':'!','J':'R','K':'5','L':'1','M':'N','N':'M',
+'O':'Q','P':'7','Q':'O','R':'J','S':'$','T':'+','U':'W',
+'V':'/','W':'%','X':'Y','Y':'U','Z':'2','.':'E'
 };
 
 const decodeMap = {};
 
 for(let k in encodeMap){
-
-    decodeMap[
-    encodeMap[k]
-    ] = k;
+    decodeMap[encodeMap[k]] = k;
 }
-
-/* ENCODE */
 
 function encode(){
 
-    let t =
-    document
-    .getElementById("input")
-    .value;
-
+    let t = document.getElementById("input").value;
     let r = "";
 
     for(let c of t){
-
-        r +=
-        encodeMap[
-        c.toUpperCase()
-        ] || c;
+        r += encodeMap[c.toUpperCase()] || c;
     }
 
-    document
-    .getElementById("output")
-    .innerText = r;
+    document.getElementById("output").innerText = r;
 }
-
-/* DECODE */
 
 function decode(){
 
-    let t =
-    document
-    .getElementById("input")
-    .value;
-
+    let t = document.getElementById("input").value;
     let r = "";
 
     for(let c of t){
-
-        r +=
-        decodeMap[c]
-        || c;
+        r += decodeMap[c] || c;
     }
 
-    document
-    .getElementById("output")
-    .innerText = r;
+    document.getElementById("output").innerText = r;
 }
-
-/* COPY */
 
 function copyText(){
 
     navigator.clipboard.writeText(
-
-    document
-    .getElementById("output")
-    .innerText
-
+        document.getElementById("output").innerText
     );
 
     alert("Copied");
 }
 
-/* RESET */
-
 function resetAll(){
 
-    document
-    .getElementById("input")
-    .value = "";
+    document.getElementById("input").value = "";
 
-    document
-    .getElementById("output")
-    .innerText =
-    "";
+    document.getElementById("output").innerText =
+    "Virus Downloading";
 }
 
+/* LOADING DOTS */
+let dots = 0;
+
+setInterval(()=>{
+
+    let out = document.getElementById("output");
+
+    if(out.innerText.startsWith("Virus Downloading")){
+
+        dots = (dots + 1) % 4;
+
+        out.innerText =
+        "Virus Downloading" + ".".repeat(dots);
+    }
+
+},500);
 
 /* PLACEHOLDER DOTS */
-
 let idots = 0;
 
 setInterval(()=>{
 
-    let input =
-    document
-    .getElementById("input");
+    let input = document.getElementById("input");
 
-    if(
-    document.activeElement
-    !== input
-    &&
-    input.value === ""
-    ){
+    if(document.activeElement !== input && input.value === ""){
 
-        idots =
-        (idots + 1) % 4;
+        idots = (idots + 1) % 4;
 
         input.placeholder =
-        "PROCESSING "
-        +
-        ".".repeat(idots);
+        ">_PROCESSING ..." + ".".repeat(idots);
     }
 
 },500);
