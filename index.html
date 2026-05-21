@@ -478,24 +478,10 @@ function resetAll(){
     document.getElementById("input").value = "";
 
     document.getElementById("output").innerText =
-    "Virus Downloading...";
+    "";
 }
 
-/* LOADING DOTS */
-
-let dots = 0;
-
-setInterval(()=>{
-
-    let out =
-    document.getElementById("output");
-
-    if(out.innerText.startsWith("")){
-
-        dots = (dots + 1) % 4;
-
-        out.innerText =
-        "Virus Downloading" + ".".repeat(dots);
+        
     }
 
 },500);
