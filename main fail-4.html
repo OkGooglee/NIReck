@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>System Decoder</title>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    font-family:'Courier New', monospace;
+    background:radial-gradient(circle at top,#0a0f1c,#000);
+    color:#00f5ff;
+    overflow:hidden;
+}
+
+/* MATRIX BACKGROUND */
+
+canvas{
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    z-index:0;
+    filter:blur(0.5px) brightness(1.2);
+}
+
+/* MAIN CONTAINER */
+
+.container{
+    position:relative;
+    z-index:2;
+
+    width:95%;
+    max-width:720px;
+
+    margin:40px auto;
+    padding:25px;
+
+    background:rgba(10,15,25,0.75);
+    backdrop-filter:blur(12px);
+
+    border:1px solid rgba(0,245,255,0.3);
+    border-radius:18px;
+
+    box-shadow:
+        0 0 25px rgba(0,245,255,0.2),
+        inset 0 0 20px rgba(0,245,255,0.05);
+}
+
+h1{
+    text-align:center;
+    margin-bottom:20px;
+    font-size:24px;
+    letter-spacing:3px;
+
+    color:#00f5ff;
+
+    text-shadow:
+        0 0 10px #00f5ff,
+        0 0 20px #00f5ff55;
+}
+
+/* TEXT AREA */
+
+textarea{
+    width:100%;
+    min-height:130px;
+
+    background:rgba(0,0,0,0.6);
+
+    border:1px solid rgba(0,245,255,0.4);
+    border-radius:10px;
+
+    color:#7df9ff;
+
+    padding:14px;
+    font-size:14px;
+
+    outline:none;
+    resize:none;
+
+    box-shadow:inset 0 0 10px rgba(0,245,255,0.08);
+
+    transition:0.3s;
+}
+
+textarea:focus{
+    border-color:#00f5ff;
+    box-shadow:0 0 15px #00f5ff55;
+}
+
+/* BUTTON GRID FIXED */
+
+.buttons{
+    display:grid;
+
+    grid-template-columns:
+    repeat(auto-fit,minmax(120px,1fr));
+
+    gap:10px;
+    margin-top:12px;
+}
+
+/* BUTTON STYLE */
+
+button{
+    width:100%;
+    min-width:0;
+
+    padding:10px;
+
+    border-radius:10px;
+
+    background:
+    linear-gradient(145deg,#05070a,#0b1220);
+
+    border:1px solid rgba(0,245,255,0.4);
+
+    color:#00f5ff;
+
+    cursor:pointer;
+
+    transition:0.25s;
+
+    font-weight:bold;
+    letter-spacing:1px;
+
+    box-shadow:
+    0 0 10px rgba(0,245,255,0.1);
+}
+
+button:hover{
+    background:#00f5ff;
+    color:#000;
+
+    transform:
+    translateY(-2px) scale(1.03);
+
+    box-shadow:
+    0 0 20px #00f5ff88;
+}
+
+/* OUTPUT */
+
+.output{
+    margin-top:18px;
+
+    border-radius:12px;
+
+    border:1px solid rgba(0,245,255,0.4);
+
+    padding:14px;
+
+    min-height:100px;
+
+    background:rgba(0,0,0,0.5);
+
+    white-space:pre-wrap;
+
+    box-shadow:
+    inset 0 0 12px rgba(0,245,255,0.08),
+    0 0 15px rgba(0,245,255,0.15);
+}
+
+.loading{
+    text-shadow:0 0 10px #00f5ff;
+}
+
+/* SCAN LINE */
+
+body::before{
+    content:"";
+
+    position:fixed;
+
+    top:0;
+    left:0;
+
+    width:100%;
+    height:100%;
+
+    background:
+    repeating-linear-gradient(
+        to bottom,
+        rgba(255,255,255,0.02),
+        rgba(255,255,255,0.02) 1px,
+        transparent 2px,
+        transparent 4px
+    );
+
+    pointer-events:none;
+
+    z-index:1;
+    opacity:0.2;
+}
+
+/* MOBILE FIX */
+
+@media(max-width:500px){
+
+    h1{
+        font-size:20px;
+    }
+
+    button{
+        font-size:13px;
+        padding:12px 6px;
+    }
+
+    textarea{
+        font-size:13px;
+    }
+
+}
+
+</style>
+</head>
+
+<body>
+
+<canvas id="bg"></canvas>
+
+<div class="container">
+
+<h1>📖 NIRECK 📖</h1>
+
+<textarea id="input"
+placeholder=">_PROCESSING ...">
+</textarea>
+
+<div class="buttons">
+
+<button onclick="encode()">3MCQ63</button>
+
+<button onclick="decode()">63CQ63</button>
+
+<button onclick="copyText()">CQ7U</button>
+
+<button onclick="resetAll()">J3$3+</button>
+
+</div>
+
+<div class="output loading"
+id="output">
+
+</div>
+
+</div>
+
+<script>
+
+/* MATRIX BACKGROUND */
+
+const canvas =
+document.getElementById("bg");
+
+const ctx =
+canvas.getContext("2d");
+
+function resizeCanvas(){
+
+    canvas.width =
+    window.innerWidth;
+
+    canvas.height =
+    window.innerHeight;
+}
+
+resizeCanvas();
+
+window.addEventListener(
+"resize",
+resizeCanvas
+);
+
+const chars = "CHARLIE";
+const size = 18;
+
+let cols =
+Math.floor(canvas.width / size);
+
+let drops =
+Array(cols).fill(1);
+
+function draw(){
+
+    ctx.fillStyle =
+    "rgba(0,0,0,0.08)";
+
+    ctx.fillRect(
+    0,
+    0,
+    canvas.width,
+    canvas.height
+    );
+
+    ctx.fillStyle =
+    "#00f5ff";
+
+    ctx.font =
+    size + "px monospace";
+
+    for(let i=0;i<drops.length;i++){
+
+        let text =
+        chars[
+        Math.floor(
+        Math.random()
+        * chars.length
+        )
+        ];
+
+        ctx.fillText(
+        text,
+        i*size,
+        drops[i]*size
+        );
+
+        if(
+        drops[i]*size >
+        canvas.height
+        &&
+        Math.random() > 0.975
+        ){
+            drops[i]=0;
+        }
+
+        drops[i]++;
+    }
+}
+
+setInterval(draw,40);
+
+/* ENCODE MAP */
+
+const encodeMap = {
+
+'A':'@',
+'B':'8',
+'C':'C',
+'D':'9',
+'E':'3',
+'F':'#',
+'G':'6',
+'H':'A',
+'I':'!',
+'J':'R',
+'K':'5',
+'L':'1',
+'M':'N',
+'N':'M',
+'O':'Q',
+'P':'7',
+'Q':'O',
+'R':'J',
+'S':'$',
+'T':'+',
+'U':'W',
+'V':'/',
+'W':'%',
+'X':'Y',
+'Y':'U',
+'Z':'2',
+'.':'E'
+
+};
+
+const decodeMap = {};
+
+for(let k in encodeMap){
+
+    decodeMap[
+    encodeMap[k]
+    ] = k;
+}
+
+/* ENCODE */
+
+function encode(){
+
+    let t =
+    document
+    .getElementById("input")
+    .value;
+
+    let r = "";
+
+    for(let c of t){
+
+        r +=
+        encodeMap[
+        c.toUpperCase()
+        ] || c;
+    }
+
+    document
+    .getElementById("output")
+    .innerText = r;
+}
+
+/* DECODE */
+
+function decode(){
+
+    let t =
+    document
+    .getElementById("input")
+    .value;
+
+    let r = "";
+
+    for(let c of t){
+
+        r +=
+        decodeMap[c]
+        || c;
+    }
+
+    document
+    .getElementById("output")
+    .innerText = r;
+}
+
+/* COPY */
+
+function copyText(){
+
+    navigator.clipboard.writeText(
+
+    document
+    .getElementById("output")
+    .innerText
+
+    );
+
+    alert("Copied");
+}
+
+/* RESET */
+
+function resetAll(){
+
+    document
+    .getElementById("input")
+    .value = "";
+
+    document
+    .getElementById("output")
+    .innerText =
+    "";
+}
+
+
+/* PLACEHOLDER DOTS */
+
+let idots = 0;
+
+setInterval(()=>{
+
+    let input =
+    document
+    .getElementById("input");
+
+    if(
+    document.activeElement
+    !== input
+    &&
+    input.value === ""
+    ){
+
+        idots =
+        (idots + 1) % 4;
+
+        input.placeholder =
+        "PROCESSING "
+        +
+        ".".repeat(idots);
+    }
+
+},500);
+
+</script>
+
+</body>
+</html>
